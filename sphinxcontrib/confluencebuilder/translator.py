@@ -823,6 +823,11 @@ class ConfluenceTranslator(BaseTranslator):
         docname = posixpath.normpath(
             self.docparent + path.splitext(node['refuri'])[0])
         doctitle = ConfluenceState.title(docname)
+
+        if '#' in docname:
+            docname = docname.split('.conf#')[0]
+            doctitle = ConfluenceState.title(docname)
+
         if not doctitle:
             ConfluenceLogger.warn('unable to build link to document due to '
                 'missing title (in {}): {}'.format(self.docname, docname))
