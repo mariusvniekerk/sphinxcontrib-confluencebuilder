@@ -1213,6 +1213,19 @@ class ConfluenceTranslator(BaseTranslator):
     def depart_desc_content(self, node):
         self.body.append(self.context.pop()) # dd
 
+    #-----------------------------------------------------
+    # autosummary "support"
+    #-----------------------------------------------------
+
+    def visit_autosummary_table(self,node):
+        pass
+
+    def depart_autosummary_table(self,node):
+        pass
+
+    def visit_autosummary_toc(self,node):
+        raise nodes.SkipNode
+
     # -----------------------------------------------------
     # docutils handling "to be completed" marked directives
     # -----------------------------------------------------
