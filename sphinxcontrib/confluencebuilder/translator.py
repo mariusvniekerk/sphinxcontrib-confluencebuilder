@@ -1139,8 +1139,17 @@ class ConfluenceTranslator(BaseTranslator):
         self.body.append(self.context.pop()) # dl
 
     def visit_desc_signature(self, node):
+
+        if 'ids' in node and self.can_anchor:
+            for id in node['ids']:
+                self.body.append(self._start_ac_macro(node, 'anchor'))
+                self.body.append(self._build_ac_parameter(node, '', id))
+                self.body.append(self._end_ac_macro(node))
+
         self.body.append(self._start_tag(node, 'dt'))
         self.context.append(self._end_tag(node))
+
+        self._has_term = True
 
     def depart_desc_signature(self, node):
         self.body.append(self.context.pop()) # dt
