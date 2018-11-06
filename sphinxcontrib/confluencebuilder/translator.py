@@ -844,6 +844,11 @@ class ConfluenceTranslator(BaseTranslator):
         docname = posixpath.normpath(
             self.docparent + path.splitext(node['refuri'])[0])
         doctitle = ConfluenceState.title(docname)
+
+        if '#' in docname:
+            docname = docname.split('.conf#')[0]
+            doctitle = ConfluenceState.title(docname)
+
         if not doctitle:
             ConfluenceLogger.warn('unable to build link to document due to '
                 'missing title (in {}): {}'.format(self.docname, docname))
@@ -1326,8 +1331,17 @@ class ConfluenceTranslator(BaseTranslator):
         self.body.append(self.context.pop()) # dl
 
     def visit_desc_signature(self, node):
+
+        if 'ids' in node and self.can_anchor:
+            for id in node['ids']:
+                self.body.append(self._start_ac_macro(node, 'anchor'))
+                self.body.append(self._build_ac_parameter(node, '', id))
+                self.body.append(self._end_ac_macro(node))
+
         self.body.append(self._start_tag(node, 'dt'))
         self.context.append(self._end_tag(node))
+
+        self._has_term = True
 
     def depart_desc_signature(self, node):
         self.body.append(self.context.pop()) # dt
@@ -1399,6 +1413,19 @@ class ConfluenceTranslator(BaseTranslator):
 
     def depart_desc_content(self, node):
         self.body.append(self.context.pop()) # dd
+
+    #-----------------------------------------------------
+    # autosummary "support"
+    #-----------------------------------------------------
+
+    def visit_autosummary_table(self,node):
+        pass
+
+    def depart_autosummary_table(self,node):
+        pass
+
+    def visit_autosummary_toc(self,node):
+        raise nodes.SkipNode
 
     # -----------------------------------------------------
     # docutils handling "to be completed" marked directives
